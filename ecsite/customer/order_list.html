@@ -15,7 +15,7 @@
 		<div id="page-footer"></div>
 	</div>
 	<script>
-		let token = get_value_from_cookie("customer_id");
+		let token = get_value_from_cookie("customer_token");
 		let countPerPage = 10;
 if(token){
 	function jump_to_next_page(cursor){
@@ -28,8 +28,10 @@ if(token){
 	function callback_func(result){
 		let orders = result;
 		let productsList = [];
-		productsList.push("<tr><td>注文日時</td><td>注文番号</td><td>状態</td><td>商品代金</td><td>送料</td>");
 		for(let j=0; j<orders.length; j++){
+			if("Incomplete" == orders[j].custom_status){
+				continue;
+			}
 			let currency = orders[j].currency_code;
 			productsList.push("<tr><td>" + orders[j].date_created + "</td><td>" + orders[j].id + "</td><td>" + orders[j].custom_status + "</td><td>" + orders[j].subtotal_inc_tax + "</td><td>" + orders[j].shipping_cost_inc_tax +"</td><tr>");
 		/*
@@ -55,7 +57,7 @@ if(token){
 			productsList.push("<tr><td colspan=3><hr></td></tr>");
 		*/
 		}
-		document.getElementById("products_list").innerHTML = productsList.join("\n");
+		document.getElementById("products_list").innerHTML = "<tr><td>注文日時</td><td>注文番号</td><td>状態</td><td>商品代金</td><td>送料</td>" + productsList.reverse().join("\n");
 /*
 		let page = result.data.customer.orders.pageInfo;
 		let navi_left = page.hasPreviousPage ? "<a href=\"javascript:jump_to_prev_page('" + prevCursor + "')\"><span style='margin-left:40px'>&lt;&lt;Prev</span></a>" : "";

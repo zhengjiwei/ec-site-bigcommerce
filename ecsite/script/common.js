@@ -139,6 +139,10 @@ function create_cart(pid, vid, count, callback){
 	http_get_by_server("/bigcommerce/common/query", {"method": "post", "url": "carts?include=lineItems.digitalItems.options%2ClineItems.physicalItems.options","data": JSON.stringify({"lineItems": [{"productId": pid, "variantId": vid, "quantity": count}]})}, callback);
 }
 
+function set_customerid_to_cart(cart_id){
+	http_get_by_server("/bigcommerce/server/query", {"method": "put", "url": "/v3/carts/" + cart_id});
+}
+
 function push_to_cart(cart_id, pid, vid, count, callback){
 	http_get_by_server("/bigcommerce/front/query", {"method": "post", "url": "carts/"+ cart_id+"/items?include=lineItems.digitalItems.options%2ClineItems.physicalItems.options","data": JSON.stringify({"lineItems": [{"productId": pid, "variantId": vid, "quantity": count}]})}, callback);
 }
@@ -192,6 +196,10 @@ function get_customer_addresses(callback){
 
 function add_customer_address(data, callback){
 	http_get_by_server("/bigcommerce/server/query", {"method": "post", "url": "/v3/customers/addresses", "data": JSON.stringify(data)}, callback);
+}
+
+function delete_customer_address(id, callback){
+	http_get_by_server("/bigcommerce/server/query", {"method": "delete", "url": "/v3/customers/addresses?id%3Ain=" + id, "data": "{}"}, callback);
 }
 
 function logout(callback){

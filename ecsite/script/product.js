@@ -24,6 +24,10 @@ function put_to_cart(){
 	get_cart_info(function(info){
 		if(info.length == 0 || info.error == "no cookie"){
 			create_cart(productId, vid, count, function(result){
+				let customer_token = get_value_from_cookie("customer_token");
+				if(customer_token){
+					set_customerid_to_cart(result.id);
+				}
 					write_cookie("cart_id", result.id);
 					update_cart_info(result);
 				});

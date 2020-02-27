@@ -29,6 +29,10 @@ if (document.getElementById("customer_login")) {
       if (result.data == false) {
         alert(result.data);
       } else {
+		  let cart_id = get_value_from_cookie("cart_id");
+		  if(cart_id){
+			  set_customerid_to_cart(cart_id);
+		  }
         window.location.href = document.getElementById("login_form").action;
       }
     });

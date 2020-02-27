@@ -14,6 +14,16 @@ function insert_shipping_to_checkout(index){
 		data.city = document.getElementsByName("user_city")[0].value;
 		data.company = document.getElementsByName("user_company")[0].value;
 		data.email=document.getElementsByName("user_email")[0].value;
+		
+		let user = get_value_from_cookie("customer_token");
+		if(user){
+			//登録
+			if(document.getElementById("save_address").checked){
+				add_customer_address(data, function(result){
+					console.log(result);
+				});
+			}
+		}
 	}else{
 		data.last_name = document.getElementById("last_name_" + index).innerHTML;
 		data.first_name = document.getElementById("first_name_" + index).innerHTML ;
@@ -27,15 +37,6 @@ function insert_shipping_to_checkout(index){
 		data.company=document.getElementById("company_" + index).innerHTML;
 		data.city=document.getElementById("city_" + index).innerHTML;
 		data.state_or_province_code = "";
-	}
-	let user = get_value_from_cookie("customer_token");
-	if(user){
-		//登録
-		if(document.getElementById("save_address").checked){
-			add_customer_address(data, function(result){
-				console.log(result);
-			});
-		}
 	}
 	//checkoutの情報を記入
 	let cart_id = get_value_from_cookie("cart_id");
@@ -85,11 +86,7 @@ if(document.getElementById("registered_shipping_address")){
 				$('input[name="delete_address"]').click(function(e){
 					let index =e.target.alt;
 					delete_customer_address(document.getElementById("addressId_"+index).innerHTML, function(result){
-						if(result.data.customerAddressDelete.customerUserErrors.length > 0){
-							alert(result.data.customerAddressDelete.customerUserErrors[0].message);
-						}else{
 							document.getElementById("saved_address_" + index).style.display = "none";
-						}
 					});
 				})
 			}
