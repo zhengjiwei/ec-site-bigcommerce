@@ -1,0 +1,74 @@
+<html>
+<head><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script type="text/javascript" src="https://libs.cmsod.jp/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="/ecsite/script/common.js"></script>
+	<title>カート</title>
+</head>
+<body style="height: auto; min-height: auto;">
+	<div style="text-align:center; width: 100%;">
+		<div id="page-header"></div>
+		<div class="title_2_font" style="margin-left:auto;margin-right:auto;width:1160px;text-align:left;margin-top:60px">注文商品一覧</div>
+		<table style="margin-left:auto;margin-right:auto;width:1160px; margin-top:60px" id="products_list">
+		</table>
+		<div id="navi_bar"></div>
+		<div id="page-footer"></div>
+	</div>
+	<script>
+		let token = get_value_from_cookie("customer_id");
+		let countPerPage = 10;
+if(token){
+	function jump_to_next_page(cursor){
+	    get_customer_orders(token, "first: "+ countPerPage + ", after:\"" + cursor + "\"", callback_func);
+	}
+	function jump_to_prev_page(cursor){
+		//get_orders_by_querystring("query: \"email:"+ mail+"\", last:" + countPerPage + ", before:\"" + cursor+ "\"", callback_func);
+	    get_customer_orders(token, "last: "+ countPerPage + ", before:\"" + cursor + "\"", callback_func);
+	}
+	function callback_func(result){
+		let orders = result;
+		let productsList = [];
+		productsList.push("<tr><td>注文日時</td><td>注文番号</td><td>状態</td><td>商品代金</td><td>送料</td>");
+		for(let j=0; j<orders.length; j++){
+			let currency = orders[j].currency_code;
+			productsList.push("<tr><td>" + orders[j].date_created + "</td><td>" + orders[j].id + "</td><td>" + orders[j].custom_status + "</td><td>" + orders[j].subtotal_inc_tax + "</td><td>" + orders[j].shipping_cost_inc_tax +"</td><tr>");
+		/*
+			let items = orders[j];
+			let currency = orders[j].currency_code;
+			productsList.push("<tr><td colspan=3 style='text-align:left'>注文日時："+orders[j].date_created + "</td></tr>");
+			for(let i=0; i<items.length; i++){
+				productsList.push("<tr>\n" +
+								  "        <td className=\"width20 valign-top\">\n" +
+								  "            <div style=\"text-align:left\"><img src=\"" + items[i].node.variant.image.src + "\" width=\"100px\" /></div>\n" +
+								  "        </td>\n" +
+								  "        <td className=\"width70 valign-top\">\n" +
+								  "            <div style=\"text-align:left\">商品名："+ items[i].node.title +"</div>\n" +
+								  "            <div style=\"text-align:left\">単価："+ Number(items[i].node.variant.priceV2.amount).toLocaleString('ja-JP', { style: 'currency', currency: currency})+"</div>\n" +
+								  "            <div style=\"text-align:left\">数量：<span>"+ items[i].node.quantity +"</span></div>\n" +
+								  "        </td>\n" +
+								  "        <td className=\"width10\">\n" +
+//								  "            <div>" + (i==(items.length-1) ? "税金："+Number(orders[j].node.totalTax).toLocaleString('ja-JP', { style: 'currency', currency:currency }) : "")  + "</div>\n" +
+//								  "            <div>" + (i==(items.length-1) ? "送料："+Number(orders[j].node.shippingLine.price).toLocaleString('ja-JP', { style: 'currency', currency:currency }) : "")  + "</div>\n" +
+								  "            <div>" + (i==(items.length-1) ? "合計："+Number(orders[j].node.totalPrice).toLocaleString('ja-JP', { style: 'currency', currency:currency }) : "")  + "</div>\n" +
+								  "    </tr>");
+			}
+			productsList.push("<tr><td colspan=3><hr></td></tr>");
+		*/
+		}
+		document.getElementById("products_list").innerHTML = productsList.join("\n");
+/*
+		let page = result.data.customer.orders.pageInfo;
+		let navi_left = page.hasPreviousPage ? "<a href=\"javascript:jump_to_prev_page('" + prevCursor + "')\"><span style='margin-left:40px'>&lt;&lt;Prev</span></a>" : "";
+		let navi_right = page.hasNextPage ? "<a href=\"javascript:jump_to_next_page('" + nextCursor + "')\"><span style='margin-left:40px'>Next&gt;&gt;</span></a>" : "";
+		document.getElementById('navi_bar').innerHTML = "<div>" + navi_left + navi_right + "</div>";
+*/		
+	}
+
+    get_customer_orders(callback_func);
+}else{
+	window.location.href="/ecsite/customer/login.html?redirect=/ecsite/customer/order_list.html";
+}
+	</script>
+	<script src="/ecsite/script/last.js"></script>
+</body>
+</html>
