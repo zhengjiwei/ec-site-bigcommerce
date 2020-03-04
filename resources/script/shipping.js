@@ -7,8 +7,13 @@ function insert_shipping_to_checkout(index){
 		data.phone = document.getElementsByName("user_phone")[0].value;
 		data.country = document.getElementById("country_select").selectedOptions[0].text;
 		data.country_code = document.getElementById("country_select").selectedOptions[0].value;
-		data.state_or_province = document.getElementById("province_select").value;
-		data.state_or_province_code = "";
+		if(document.getElementById("province_select").style.display == "inline"){
+			data.state_or_province = document.getElementById("province_select").selectedOptions[0].text;
+			data.state_or_province_code = document.getElementById("province_select").selectedOptions[0].value;
+		}else{
+			data.state_or_province = document.getElementById("province_input").text;
+			data.state_or_province_code = "";
+		}
 		data.address1 = document.getElementsByName("user_address1")[0].value;
 		data.address2 = document.getElementsByName("user_address2")[0].value;
 		data.city = document.getElementsByName("user_city")[0].value;
@@ -32,6 +37,7 @@ function insert_shipping_to_checkout(index){
 		data.country=document.getElementById("country_" + index).innerHTML;
 		data.country_code=document.getElementById("country_code_" + index).innerHTML;
 		data.state_or_province=document.getElementById("province_" + index).innerHTML;
+		data.state_or_province_code=document.getElementById("province_code_" + index).innerHTML;
 		data.address1=document.getElementById("address1_" + index).innerHTML;
 		data.address2=document.getElementById("address2_" + index).innerHTML;
 		data.company=document.getElementById("company_" + index).innerHTML;
@@ -64,6 +70,7 @@ if(document.getElementById("registered_shipping_address")){
             "<div id=\"country_"+i+"\">"+ addresses[i].country +"</div>\n" +
             "<div id=\"country_code_"+i+"\" style=\"display:none\">"+ addresses[i].country_code +"</div>\n" +
             "<div id=\"province_"+i+"\">"+ addresses[i].state_or_province +"</div>\n" +
+            "<div id=\"province_code_"+i+"\" style=\"display:none\">"+ addresses[i].state_or_province_code +"</div>\n" +
             "<div id=\"city_"+i+"\">"+ addresses[i].city +"</div>\n" +
             "<div id=\"address1_"+i+"\">"+ addresses[i].address1 +"</div>\n" +
             "<div id=\"address2_"+i+"\">"+ addresses[i].address2 +"</div>\n" +
@@ -104,6 +111,30 @@ if(document.getElementById("country_select")){
 					list.push("<option value=\""+ item.locations[0].country_iso2 +"\">"+ country_name +"</option>");
 			});
 		   document.getElementById("country_select").innerHTML = list.join("\n");
+
+    $("#country_select").on('change', function(event){
+        document.getElementById("province_select").innerHTML = "";
+        let target = event.target.options;
+        let iso2 = target[target.selectedIndex].value;
+		get_states_of_country(iso2, function(result){
+		    if(result && result.length > 0){
+                let provinces = result;
+                let list = [];
+                for(let i=0; i< provinces.length; i++){
+					list.push("<option id=\"p_" + provinces[i].id + "\" value=\""+ provinces[i].state_abbreviation +"\">"+provinces[i].state +"</option>");
+                }
+                document.getElementById("province_select").innerHTML = list.join("\n");
+                document.getElementById("province_select").style.display = "inline";
+                document.getElementById("province_input").style.display = "none";
+            }else{
+                document.getElementById("province_select").style.display = "none";
+                document.getElementById("province_input").style.display = "inline";
+            }
+		});
+    });
+
+
+
 		}else{
 			alert(result.data);
 		}

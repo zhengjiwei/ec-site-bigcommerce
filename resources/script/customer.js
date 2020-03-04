@@ -6,7 +6,7 @@ if (document.getElementById("create_customer")) {
     let last_name = document.getElementById("last_name").value;
     create_customer_user(email, password, first_name, last_name, function(result) {
       if (result.data.length > 0) {
-        window.location.href = "/ecsite/customer/login.html";
+        window.location.href = "/customer/login.html";
       }
     });
   });

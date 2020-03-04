@@ -163,6 +163,13 @@ function get_shipping_countries(callback){
 	http_get_by_server("/bigcommerce/server/query", {"method": "get","url": "/v2/shipping/zones"}, callback);
 }
 
+function get_states_of_country(iso2, callback){
+	http_get_by_server("/bigcommerce/server/query", {"method": "get","url": "/v2/countries?country_iso2="+iso2}, function(result){
+		let id = result[0].id;
+		http_get_by_server("/bigcommerce/server/query", {"method": "get","url": "/v2/countries/"+ id +"/states"},callback);
+	});
+}
+
 function add_shipping_address_to_checkout(cart_id, data, callback){
 	http_get_by_server("/bigcommerce/server/query", {"method": "post","url": "/v3/checkouts/"+cart_id+"/consignments?include=consignments.available_shipping_options", "data": JSON.stringify(data)}, callback);
 }
@@ -254,7 +261,7 @@ function set_products_list(cid, limit, direction, cursor, tagId){
             for (let i = 0; i < data.length; i++) {
                 let pid = data[i].node.id;
 				let currencyCode = data[i].node.prices.price.currencyCode
-				let str_html = "<div style=\"float:left\"><a href=\"/ecsite/products/product.html?pid=" + encodeURIComponent(pid) + "\"><img src=\"" + data[i].node.defaultImage.url+ "\" class=\"image-size\"><div>";
+				let str_html = "<div style=\"float:left\"><a href=\"/products/product.html?pid=" + encodeURIComponent(pid) + "\"><img src=\"" + data[i].node.defaultImage.url+ "\" class=\"image-size\"><div>";
 				str_html += get_price_html(data[i], currencyCode) + "</div></a></div>"
                 output.push(str_html);
             }

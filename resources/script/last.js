@@ -4,7 +4,7 @@ function get_normal_collection(count, callback) {
 
 function show_login_page() {
   let currentURL = window.location.href;
-  window.location.href = "/ecsite/customer/login.html?redirect=" + encodeURIComponent(currentURL);
+  window.location.href = "/customer/login.html?redirect=" + encodeURIComponent(currentURL);
 }
 
 function set_home_page_products() {
@@ -14,7 +14,7 @@ function set_home_page_products() {
       let output = [];
       for (let i = 0; i < data.length; i++) {
         let pid = atob(data[i].node.id).split("/")[4];
-        output.push('<div style="float:left;margin-right:20px"><a href="/ecsite/products/product.html?pid=' + pid + '"><img src="' + data[i].node.images.edges[0].node.src + '" width="260px" height="260px"></a></div>');
+        output.push('<div style="float:left;margin-right:20px"><a href="/products/product.html?pid=' + pid + '"><img src="' + data[i].node.images.edges[0].node.src + '" width="260px" height="260px"></a></div>');
       }
       document.getElementById('home_collection').innerHTML = output.join("");
     })
@@ -24,7 +24,7 @@ function set_home_page_products() {
 
 console.log(new Date());
 if ($("#page-header").length > 0) {
-    $("#page-header").load("/ecsite/page_header.html", function() {
+    $("#page-header").load("/page_header.html", function() {
         if (document.getElementById("login")) {
             let token = get_value_from_cookie("customer_token");
             if (token) {
@@ -35,7 +35,7 @@ if ($("#page-header").length > 0) {
         }
         console.log(new Date());
         let url = new URL(window.location.href);
-        if(url.pathname == "/ecsite/index.html"){
+        if(url.pathname == "/index.html"){
             get_categories(function(result) {
                 console.log(new Date());
                 let categories = result.site.categoryTree;
@@ -48,9 +48,9 @@ if ($("#page-header").length > 0) {
                     get_category_info(categories[index].entityId, function(category_info){
                         let src_img = category_info.node.defaultImage;
                         if(!src_img){
-                            src_img = "/ecsite/images/c" + (td_array.length+1) + ".png";
+                            src_img = "/images/c" + (td_array.length+1) + ".png";
                         }
-                        td_array.push("<td><a href=\"/ecsite/collections/collection_one.html?cid=" + categories[index].entityId + "\"><img src=\"" + src_img + "\" width=\"285px\" height=\"100px\"></a></td>");
+                        td_array.push("<td><a href=\"/collections/collection_one.html?cid=" + categories[index].entityId + "\"><img src=\"" + src_img + "\" width=\"285px\" height=\"100px\"></a></td>");
                         if(td_array.length == 8){
                             let str_html = "<table><tr>" + td_array[0] + td_array[1] + td_array[2] + td_array[3] + "</tr><tr>" + td_array[4] + td_array[5] + td_array[6] + td_array[7] + "</tr></table>";
                             if (document.getElementById("normal_collections")) {
@@ -65,5 +65,5 @@ if ($("#page-header").length > 0) {
 }
 
 if ($("#page-footer").length > 0) {
-  $("#page-footer").load("/ecsite/page_footer.html");
+  $("#page-footer").load("/page_footer.html");
 }
