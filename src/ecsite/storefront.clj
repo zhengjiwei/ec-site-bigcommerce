@@ -18,11 +18,7 @@
     (com.auth0.jwt.interfaces Verification DecodedJWT))
     )
 
-(def shop-name "store-354")
-(def shop-cache "7xuqbyzkli")
-(def ACCESS_TOKEN  "7szy414j7vqgcloog7qq15idhfc7ut9")
-(def CLIENT_ID "9woozsildiyjkk9x3inyrc4r0nki3cu")
-(def CLIENT_SECRET "968f49b8a492a50104e19ecd373a2952e7e1ab86f1d905158b3da1fb589b796c")
+(def store_setting (ref {}))
 
 ;
 ;(defn id-to-base64 [^String type ^String id]
@@ -48,7 +44,7 @@
 (defn create-jwt [json-data]
   (try
     (let [expire (Date. (+ (.getTime (Date.)) (* 30 24 3600 1000)))
-          alg (Algorithm/HMAC256 CLIENT_SECRET)]
+          alg (Algorithm/HMAC256 (get @store_setting "client_secret"))]
       (-> (JWT/create)
           (.withIssuer "bigcommerce")
           (.withExpiresAt expire)
@@ -65,7 +61,7 @@
 
 (defn verify-jwt [jwt]
   (try
-    (let [alg (Algorithm/HMAC256 CLIENT_SECRET)
+    (let [alg (Algorithm/HMAC256 (get @store_setting "client_secret"))
           verifier (-> alg JWT/require (.withIssuer (into-array ["bigcommerce"])) (.build))
           ^DecodedJWT decodeJwt (.verify verifier jwt)
           token (.getToken decodeJwt)
@@ -80,7 +76,7 @@
 
 (defn common-post [^String url json-data]
   (prn "### url=" url json-data)
-    (client/post (str "https://" shop-name ".mybigcommerce.com/api/storefront/" url)
+    (client/post (str "https://" (get @store_setting "shop_name") ".mybigcommerce.com/api/storefront/" url)
                  {:content-type "application/json"
                   :cookie-policy :standard
                   :accept "application/json"
@@ -90,7 +86,7 @@
 
 (defn front-query [^String url xsrf-token session-token id]
   (prn "## front-query" url xsrf-token session-token id)
-  (client/get (str "https://" shop-name ".mybigcommerce.com/api/storefront/" url)
+  (client/get (str "https://" (get @store_setting "shop_name") ".mybigcommerce.com/api/storefront/" url)
                {:cookies {"SHOP_SESSION_TOKEN" {:value session-token} "fornax_anonymousId" {:value id}}
                 :content-type "application/json"
                 :cookie-policy :standard
@@ -100,7 +96,7 @@
 
 (defn front-post [^String url xsrf-token session-token id json-data]
   (prn "## front-post" url xsrf-token session-token id json-data)
-  (client/post (str "https://" shop-name ".mybigcommerce.com/api/storefront/" url)
+  (client/post (str "https://" (get @store_setting "shop_name") ".mybigcommerce.com/api/storefront/" url)
               {:cookies {"SHOP_SESSION_TOKEN" {:value session-token} "fornax_anonymousId" {:value id}}
                :content-type "application/json"
                :cookie-policy :standard
@@ -112,7 +108,7 @@
 
 (defn front-delete [^String url xsrf-token session-token id]
   (prn "## front-delete" url xsrf-token session-token id)
-  (client/delete (str "https://" shop-name ".mybigcommerce.com/api/storefront/" url)
+  (client/delete (str "https://" (get @store_setting "shop_name") ".mybigcommerce.com/api/storefront/" url)
                  {:cookies {"SHOP_SESSION_TOKEN" {:value session-token} "fornax_anonymousId" {:value id}}
                   :content-type "application/json"
                   :cookie-policy :standard
@@ -122,7 +118,7 @@
 
 (defn front-put [^String url xsrf-token session-token id json-data]
   (prn "### front-put:" url xsrf-token session-token id json-data)
-  (client/put (str "https://" shop-name ".mybigcommerce.com/api/storefront/" url)
+  (client/put (str "https://" (get @store_setting "shop_name") ".mybigcommerce.com/api/storefront/" url)
               {:cookies {"SHOP_SESSION_TOKEN" {:value session-token} "fornax_anonymousId" {:value id}}
                :content-type "application/json"
                :cookie-policy :standard
@@ -135,8 +131,8 @@
 
 (defn server-query [^String url]
   (prn "### server-query" url)
-  (client/get (str "https://api.bigcommerce.com/stores/" shop-cache url)
-              {:headers {:x-auth-client CLIENT_ID :x-auth-token ACCESS_TOKEN}
+  (client/get (str "https://api.bigcommerce.com/stores/" (get @store_setting "shop_cache") url)
+              {:headers {:x-auth-client (get @store_setting "client_id") :x-auth-token (get @store_setting "access_token")}
                :content-type "application/json"
                :cookie-policy :standard
                :accept "application/json"}
@@ -145,19 +141,19 @@
 
 (defn server-post [^String url json-data]
   (prn "### server-post" url json-data)
-  (let [input {:headers {:x-auth-client CLIENT_ID :x-auth-token ACCESS_TOKEN}
+  (let [input {:headers {:x-auth-client (get @store_setting "client_id") :x-auth-token (get @store_setting "access_token")}
                :content-type "application/json"
                :cookie-policy :standard
                :accept "application/json"}
         input (if (empty? json-data) input (assoc input :form-params json-data))]
-    (client/post (str "https://api.bigcommerce.com/stores/" shop-cache url) input)
+    (client/post (str "https://api.bigcommerce.com/stores/" (get @store_setting "shop_cache") url) input)
     )
   )
 
 (defn server-put [^String url json-data]
   (prn "### server-put" url json-data)
-  (client/put (str "https://api.bigcommerce.com/stores/" shop-cache url)
-              {:headers {:x-auth-client CLIENT_ID :x-auth-token ACCESS_TOKEN}
+  (client/put (str "https://api.bigcommerce.com/stores/" (get @store_setting "shop_cache") url)
+              {:headers {:x-auth-client (get @store_setting "client_id") :x-auth-token (get @store_setting "access_token")}
                :content-type "application/json"
                :cookie-policy :standard
                :accept "application/json"
@@ -166,18 +162,18 @@
 
 (defn server-delete [^String url json-data]
   (prn "### server-delete" url json-data)
-  (let [input {:headers {:x-auth-client CLIENT_ID :x-auth-token ACCESS_TOKEN}
+  (let [input {:headers {:x-auth-client (get @store_setting "client_id") :x-auth-token (get @store_setting "access_token")}
                :content-type "application/json"
                :cookie-policy :standard
                :accept "application/json"}
         input (if (empty? json-data) input (assoc input :form-params json-data))]
-    (client/delete (str "https://api.bigcommerce.com/stores/" shop-cache url) input)
+    (client/delete (str "https://api.bigcommerce.com/stores/" (get @store_setting "shop_cache") url) input)
     )
   )
 
 (defn graphql-query [token json]
   (prn "### token=" token json)
-  (client/post (str "https://" shop-name ".mybigcommerce.com/graphql")
+  (client/post (str "https://" (get @store_setting "shop_name") ".mybigcommerce.com/graphql")
                {:headers {:Authorization (str "Bearer " token)}
                 :content-type "application/json"
                 :cookie-policy :standard
@@ -189,8 +185,8 @@
 
 (defn get-api-token []
   (-> (client/post
-        (str "https://api.bigcommerce.com/stores/" shop-cache "/v3/storefront/api-token")
-        {:headers {:x-auth-client CLIENT_ID :x-auth-token ACCESS_TOKEN}
+        (str "https://api.bigcommerce.com/stores/" (get @store_setting "shop_cache") "/v3/storefront/api-token")
+        {:headers {:x-auth-client (get @store_setting "client_id") :x-auth-token (get @store_setting "access_token")}
          :content-type "application/json"
          :cookie-policy :standard
          :accept "application/json"
@@ -245,8 +241,8 @@
         json-data (if (empty? p_items) json-data (append_items json-data p_items))
         json-data (if (empty? d_items) json-data (append_items json-data d_items))
         json-data (if (empty? g_items) json-data (append_items json-data g_items))]
-    (client/post (str "https://api.bigcommerce.com/stores/" shop-cache url)
-                 {:headers {:x-auth-client CLIENT_ID :x-auth-token ACCESS_TOKEN}
+    (client/post (str "https://api.bigcommerce.com/stores/" (get @store_setting "shop_cache") url)
+                 {:headers {:x-auth-client (get @store_setting "client_id") :x-auth-token (get @store_setting "access_token")}
                   :content-type "application/json"
                   :cookie-policy :standard
                   :accept "application/json"
@@ -369,6 +365,18 @@
     )
   )
 
+(defn reset-customer-password [request]
+	(prn "### reset-customer-password")
+	(let [cookies (:cookies request)
+        url (-> request :params :url)
+        customer_token (-> cookies (get "customer_token") :value)
+        customer_id (when (not-empty customer_token) (-> customer_token verify-jwt (get "customer_id")))
+		json-data (json/read-str (-> request :params :data))
+        ]
+	      (server-put (str url customer_id) json-data)
+		)
+	)
+
 (defn process-common [request]
   (try+
     (let [params (:params request)
@@ -413,6 +421,8 @@
                    "PUT" (condp re-find url
                            #"\/v3\/carts\/"
                            (add-customerid-to-cart request)
+                           #"\/v2\/customers\/"
+							(reset-customer-password request)
                            (server-put url (json/read-str data))
                            )
                    )
@@ -490,7 +500,6 @@
         pay_token (-> (server-post "/v3/payments/access_tokens"
                                    {"order"{"id" (Integer/parseInt (str order_id)),
                                             "is_recurring" false}}) :body json/read-str (get "data") (get "id"))
-		_ (prn "### pay token=" pay_token)
         json-data (-> request :params :data json/read-str)
         json-data (assoc json-data "type" "card")
         pay_currency_code (get order_info "currency_code")
@@ -500,14 +509,14 @@
                               "payment_method_id" "stripe.card"
                               "amount" pay_amount
                               "currency_code" pay_currency_code}}
-        input {:headers {:x-auth-client CLIENT_ID :x-auth-token ACCESS_TOKEN :authorization (str "PAT " pay_token)}
+        input {:headers {:x-auth-client (get @store_setting "client_id") :x-auth-token (get @store_setting "access_token") :authorization (str "PAT " pay_token)}
                :content-type "application/json"
                :cookie-policy :standard
                :accept "application/vnd.bc.v1+json"
                :form-params json-data
                }]
     (prn "## input=" input)
-    (client/post (str "https://payments.bigcommerce.com/stores/" shop-cache "/payments") input)
+    (client/post (str "https://payments.bigcommerce.com/stores/" (get @store_setting "shop_cache") "/payments") input)
     )
   )
 

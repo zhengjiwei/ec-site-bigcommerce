@@ -1,3 +1,20 @@
+
+if (document.getElementById("reset_password")) {
+  $("#reset_password").on("click", function(event) {
+    let email = document.getElementById("user_email").value;
+    let old_password = document.getElementById("old_user_password").value;
+    let new_password = document.getElementById("new_user_password").value;
+    let new_password_2 = document.getElementById("new_user_password_2").value;
+	if(new_password != new_password_2){
+		alert("パスワードは一致しない");
+	}else{
+		reset_customer_password(email, old_password, new_password, function(result){
+			window.location.href = "/index.html";
+		});
+	}
+  });
+}
+
 if (document.getElementById("create_customer")) {
   $("#create_customer").on("click", function(event) {
     let email = document.getElementById("user_email").value;

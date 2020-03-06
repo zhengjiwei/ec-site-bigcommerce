@@ -52,7 +52,7 @@ function get_url_parameter(url, target) {
 function http_get_common(url, data, callback) {
   $.ajax({
     type: 'POST',
-    timeout: 5000,
+    timeout: 50000,
     url: url,
     headers: {
       "Content-Type": "application/json",
@@ -73,7 +73,7 @@ function http_get_by_server_sync(url, input,callback){
             url: url,
 			data:input,
             dataType: 'json',
-            timeout: 5000,
+            timeout: 50000,
             cache: false,
             async:false
 	   }).done(function(result, status, xhr){
@@ -90,7 +90,7 @@ function http_get_by_server(url, input, callback){
 			url: url,
 			data:input,
 			dataType: 'json',
-			timeout: 15000,
+			timeout: 50000,
 			cache: false,
 	 }).done(function(result, status, xhr){
 		set_wait_cursor(false);
@@ -219,6 +219,12 @@ function get_customer_orders(callback){
 	last_one_year = last_one_year.toISOString();
 	let url =  "/v2/orders?min_date_created=" + last_one_year;
 	http_get_by_server("/bigcommerce/server/query", {"method": "get", "url":url}, callback);
+}
+
+function reset_customer_password(email, old_password, new_password, callback){
+	customer_login(email, old_password, function(result){
+		http_get_by_server("/bigcommerce/server/query", {"method": "put", "url": "/v2/customers/", "data":JSON.stringify({"_authentication": {"password": new_password, "password_confirmation": new_password}})}, callback);
+	});
 }
 
 function get_price_html(data, currencyCode){
