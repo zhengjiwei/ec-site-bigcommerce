@@ -21,8 +21,6 @@ function set_home_page_products() {
   }
 }
 
-
-console.log(new Date());
 if ($("#page-header").length > 0) {
     $("#page-header").load("/page_header.html", function() {
         if (document.getElementById("login")) {
@@ -33,11 +31,9 @@ if ($("#page-header").length > 0) {
                 document.getElementById("order_list").style.display = "inline";
             }
         }
-        console.log(new Date());
         let url = new URL(window.location.href);
         if(url.pathname == "/index.html"){
             get_categories(function(result) {
-                console.log(new Date());
                 let categories = result.site.categoryTree;
                 let td_array = [];
                 for (var i = 0; i < 8; i++) {

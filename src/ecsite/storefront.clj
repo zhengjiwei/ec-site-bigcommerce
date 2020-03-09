@@ -487,7 +487,7 @@
       )
     (catch Exception e
       (prn "### error=" e)
-      {:status 501 :body (cjson/generate-string e)}
+      {:status 501 :body (cjson/generate-string {:error "error"})}
       )
     )
   )

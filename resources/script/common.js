@@ -122,7 +122,6 @@ function get_products_list_in_category(cid, limit, direction,cursor, callback){
 		str_query += "first:"+limit;
 	}
 	str_query +="){ pageInfo{ hasNextPage hasPreviousPage startCursor, endCursor} edges{ node{ id name path description defaultImage{ url(width:100, height:100) } prices{ price{ value currencyCode } salePrice{value} retailPrice{value} }  } } }}}}";
-	console.log(str_query);
 	http_get_by_server("/bigcommerce/graphql/query", {"method":"get", "data": JSON.stringify({"query":str_query})}, callback);
 }
 
@@ -192,7 +191,6 @@ function create_customer_user(email, password, first, last, callback){
 
 function customer_login(email, password, callback){
 	http_get_by_server("/bigcommerce/server/query", {"method": "get", "url": "/v3/customers?email%3Ain="+encodeURIComponent(email)}, function(result){
-		console.log(result);
 		http_get_by_server("/bigcommerce/server/query", {"method": "post", "url": "/v2/customers/"+ result.data[0].id +"/validate", "data": JSON.stringify({"email": email, "password": password})}, function(result1){callback(result.data[0].id, result1)});
 	});
 }

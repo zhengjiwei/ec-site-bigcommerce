@@ -19,13 +19,12 @@ function insert_shipping_to_checkout(index){
 		data.city = document.getElementsByName("user_city")[0].value;
 		data.company = document.getElementsByName("user_company")[0].value;
 		data.email=document.getElementsByName("user_email")[0].value;
-		
+
 		let user = get_value_from_cookie("customer_token");
 		if(user){
 			//登録
 			if(document.getElementById("save_address").checked){
 				add_customer_address(data, function(result){
-					console.log(result);
 				});
 			}
 		}
