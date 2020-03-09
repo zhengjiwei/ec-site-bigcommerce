@@ -206,7 +206,7 @@
     {} json)
   )
 
-(defn add-billing-address [url token session id json-data]
+(defn add-billing-address [url token session id json-data email]
   (let [new-json {"firstName" (get json-data "first_name")
                   "lastName" (get json-data "last_name")
                   "stateOrProvince" (get json-data "state_or_province")
@@ -215,10 +215,7 @@
                   "countryCode" (get json-data "country_code")
                   }
         new-json (merge new-json (select-keys json-data ["city" "address1" "address2" "company" "email" "phone"]))
-        new-json (if (nil? (get new-json "email"))
-                (assoc new-json "email"
-                                (-> (server-query (str "/v3/customers?id%3Ain=" (get json-data "customerId")))
-                                    :body json/read-str (get "data") first (get "email"))) new-json)
+        new-json (if (nil? (get new-json "email")) (assoc new-json "email" email) new-json)
         ]
     (front-post url token session id new-json)
     )
@@ -266,14 +263,16 @@
   (prn "#### cart-to-order")
   (let [cookies (:cookies request)
         customer_token (-> cookies (get "customer_token") :value)
-        customer_id (when (not-empty customer_token) (-> customer_token verify-jwt (get "customer_id")))
+        customer_info (when (not-empty customer_token) (-> customer_token verify-jwt))
+        customer_id (when (not-empty customer_info) (get customer_info "customer_id"))
+        customer_email (when (not-empty customer_info) (get customer_info "email"))
         json-data (if (not-empty customer_id) (assoc json-data "customerId" (str customer_id)) json-data)
         token (:value (get cookies "XSRF-TOKEN"))
         session (:value (get cookies "SHOP_SESSION_TOKEN"))
         id (:value (get cookies "fornax_anonymousId"))
         cart_id (:value (get cookies "cart_id"))
         ]
-    (add-billing-address (str "checkouts/" cart_id "/billing-address") token session id json-data)
+    (add-billing-address (str "checkouts/" cart_id "/billing-address") token session id json-data customer_email)
     (add-shipping-option (add-shipping-address url token session id json-data))
     ;transform checkout to order
     (server-post (str "/v3/checkouts/" cart_id "/orders") nil)

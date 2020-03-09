@@ -1,37 +1,58 @@
+### テスト環境作成
+
+###### Macの場合
+- git をインストールする
+ - $ brew update
+ - $ brew install git
+- openJDKをインストールする
+ - https://qiita.com/spaciba_h_t/items/c96e96be99596b0a9fe4
+- leiningen をインストールする  
+ - brew install leiningen  
+
+###### Windowsの場合
+- git をインストールする
+ - https://qiita.com/toshi-click/items/dcf3dd48fdc74c91b409
+- openJDKをインストールする
+ - https://qiita.com/ryo-sato/items/87d05021fcc0519e8828
+- leiningenをインストールする
+ - https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein.bat をローカルにダウンロードする
+ - lein.bat self-install  
+ ※失敗の場合、https://github.com/technomancy/leiningen/releases/download/2.9.2/leiningen-2.9.2-standalone.zip を手動ダウンロードして、lein.bat と同じフォルダに解凍してください。lein.bat所在フォルダのパスを通す
+ - 詳細は http://antibayesian.hateblo.jp/entry/20120122/1327236946
+
 ### 起動
+- git clone https://github.com/zheng-jiwei/ec-site-bigcommerce.git
+- cloneされたフォルダーに移動する
 - `lein ring server-headless` でサーバーを起動してください。  
 - ブラザーで `http://localhost:8080/index.html` をアクセスしたら、サイトの表示ができます。
 
 ***
 ### 実装機能
-##### サイト表示
-- カテゴリの表示  
-- カテゴリ毎の商品リスト表示  
-- 商品のメーカー希望価格、通常販売価格、セール価格の表示  
-- 商品リストをページ分けで表示  
-- 商品詳細情報の表示  
-- 商品オプションがあれば、オプションの選択肢表示  
-- 商品オプションの選択によって商品価格表示の変更  
-- 支払い画面に商品金額、税金、送料を表示する  
+- トップページ
+![index](readme/index.jpg)
 
-##### 商品の購入
-- カートに商品追加  
-- カートにある商品数を商品の追加と連動する  
-- カートに商品の閲覧、商品数の変更できる（トータル金額を自動再計算）  
-- カートに商品の削除  
-- 住所入力画面に店舗対応の発送先の国選択リストが表示される  
-- 国の選択によって、県（州）のリストが取得できれば県（州）の選択リストが表示される  
-- 店舗設定済みの支払い方法を画面に表示（今は stripeだけ実装しています）  
-- orderを完成する  
+- カテゴリページ
+![category](readme/category.jpg)
 
-##### 会員
-- 会員登録機能  
-- ログイン  
-- パスワード変更（パスワードを忘れてメールで再設定URLを送信する機能はAPIサポートしないので独自送信必要があって実装していないです）  
-- 注文時入力住所の保存  
-- 保存された住所の表示と再利用  
-- 注文履歴の表示  
-　
+- 商品ページ
+![prodcut](readme/product.jpg)
+
+- カート表示ページ
+![cart](readme/cart.jpg)
+
+- 住所入力ページ
+![shipping](readme/shipping.jpg)
+
+- 支払い情報入力ページ
+![payment](readme/payment.jpg)
+
+- 注文完了ページ
+![complete](readme/end.jpg)
+
+- 会員ログイン
+![login](readme/login.jpg)
+
+
 ***
 
 ### 問題

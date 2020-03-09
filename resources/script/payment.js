@@ -2,8 +2,12 @@ let cart_id = get_value_from_cookie("cart_id");
 get_checkout_info(cart_id, function(result){
 		if(result){
 			let address = result.consignments[0].shippingAddress;
+			let email = result.cart.email;
+			if(address.email){
+				email = address.email;
+			}
 			let strAddress =  "<div><span>氏名：</span>"+ address.firstName +"&nbsp"+ address.lastName +"</div>";
-			strAddress += "<div><span>Email："+ address.email+"</div>";
+			strAddress += "<div><span>Email："+ email+"</div>";
 			strAddress += "<div><span>会社名："+ address.company +"</div>";
 			strAddress += "<div><span>住所：</span>";
 			strAddress += address.address2=="" ?  "" : address.address2+",&nbsp";
