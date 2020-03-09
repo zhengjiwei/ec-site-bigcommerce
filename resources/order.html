@@ -20,57 +20,48 @@
 	<script>
 
 let orderid = get_url_parameter(window.location.href, "oid");
-//let email = get_url_parameter(window.location.href, "email");
-let token = get_value_from_cookie("shopifyuser");
+let token = get_value_from_cookie("customer_token");
 if(token == ""){
 	window.location.href="/customer/login.html?redirect=" + encodeURIComponent(window.location.href);
 }else{
 if(orderid != ""){
-	query_customer_order(token, "query: \"id:"+ orderid +"\", first:1", function(res){
-		if(res.errors){
-			alert(res.errors[0].message);
-		}else if(res.data.customer.orders.edges.length == 0){
-			document.getElementById("shipping_address").style.display = "none";
-			document.getElementById("original_address").style.display = "none";
+	get_order_by_id(orderid, function(result){
+		if(result.errors){
+			alert(result.error);
 		}else{
-			let result = res.data.customer.orders.edges[0].node;
-			let items = result.lineItems.edges;
-			let address = result.shippingAddress;
-			let price = result.totalPrice;
-			let currency =  result.currencyCode;
 			let productsList = [];
-
-			for(let i=0; i<items.length; i++){
-				let options = items[i].node.variant.product.options;
-				let str_option = items[i].node.variant.title;
-				if(options.length == 1 && options[0].values.length == 1){
-					str_option = "";
-				}
+			let address = result.billing_address;
+			for(let i=0; i<result.products.length; i++){
+						let options = [];
+						result.products[i].product_options.forEach(opt=>{
+								options.push(opt.display_value);
+						});
+						options = options.join("x");
 	                productsList.push("<tr>\n" +
                     "        <td className=\"width20 valign-top\">\n" +
-                    "            <div style=\"text-align:left\"><img src=\"" + items[i].node.variant.image.src + "\" width=\"100px\"/></div>\n" +
+                    "            <div style=\"text-align:left\"><img src=\"" + result.products[i].img + "\" width=\"100px\"/></div>\n" +
                     "        </td>\n" +
                     "        <td className=\"width70 valign-top\">\n" +
-                    "            <div style=\"text-align:left\">商品名："+ items[i].node.title +"</div>\n" +
-                    "            <div style=\"text-align:left\">商品オプション："+ str_option +"</div>\n" +
-                    "            <div style=\"text-align:left\">単価："+ Number(items[i].node.variant.priceV2.amount).toLocaleString('ja-JP', { style: 'currency', currency: currency})+"</div>\n" +
-                    "            <div style=\"text-align:left\">数量：<span>"+ items[i].node.quantity +"</span></div>\n" +
+                    "            <div style=\"text-align:left\">商品名："+ result.products[i].name +"</div>\n" +
+                    "            <div style=\"text-align:left\">商品オプション："+ options +"</div>\n" +
+                    "            <div style=\"text-align:left\">単価："+ number_to_currency(result.products[i].price_ex_tax, result.currency_code) +"</div>\n" +
+                    "            <div style=\"text-align:left\">数量：<span>"+ result.products[i].quantity +"</span></div>\n" +
                     "        </td>\n" +
                     "        <td className=\"width10\">\n" +
-                    "            <div>" + Number(parseInt(items[i].node.variant.priceV2.amount) * items[i].node.quantity).toLocaleString('ja-JP', { style: 'currency', currency:currency })+ "</div>\n" +
+                    "            <div>" + number_to_currency(result.products[i].total_ex_tax,result.currency_code) + "</div>\n" +
                     "    </tr>");
 			}
             productsList.push("<tr><td colspan=\"3\"><div style=\"border-top: solid 1px lightgray\"></div></td></tr>\n" +
                 "<tr>\n" +
                 "<td class=\"width20 valign-top\"><div style=\"text-align:left\"></div></td>\n" +
                 "<td class=\"width80 valign-top\"></td>\n" +
-                "<td>税：<span id=\"all_tax\">"+ Number(result.totalTaxV2.amount).toLocaleString('ja-JP', { style: 'currency', currency:currency }) +"</span>  </td>\n" +
+                "<td>税：<span id=\"all_tax\">"+ number_to_currency(result.total_tax, result.currency_code) +"</span>  </td>\n" +
                 "</tr>\n" +
                 "<tr>\n" +
                 "<td colspan=\"3\"><div style=\"border-top: solid 1px lightgray\"></div></td>\n" +
                 "</tr>\n" +
                 "<tr>\n" +
-                "<td></td><td></td><td>送料："+ Number(result.totalShippingPriceV2.amount).toLocaleString('ja-JP', { style: 'currency', currency:currency }) +"</td>\n" +
+                "<td></td><td></td><td>送料："+ number_to_currency(result.shipping_cost_inc_tax, result.currency_code) +"</td>\n" +
                 "</tr>\n" +
 				 "<tr>\n" +
                 "<td colspan=\"3\"><div style=\"border-top: solid 1px lightgray\"></div></td>\n" +
@@ -78,25 +69,25 @@ if(orderid != ""){
                 "<tr>\n" +
                 "<td></td>\n" +
                 "<td><div style=\"float:right;\">合計：</div></td>\n" +
-                "<td><span id=\"total_price\" style=\"font-size:18px\">"+ Number(result.totalPriceV2.amount).toLocaleString('ja-JP', { style: 'currency', currency:currency }) +"</span></td>\n" +
+                "<td><span id=\"total_price\" style=\"font-size:18px\">"+ number_to_currency(result.total_inc_tax, result.currency_code) +"</span></td>\n" +
                 "</tr>"
 			);
 			document.getElementById("products_list").innerHTML = productsList.join("\n");
 
 			let strAddress =  "<div>届先：</div>";
-			strAddress += "<div><span>氏名：</span>"+ address.firstName +"&nbsp"+ address.lastName +"</div>";
+			strAddress += "<div><span>氏名：</span>"+ address.first_name +"&nbsp"+ address.last_name +"</div>";
 			strAddress += "<div><span>会社名："+ address.company +"</div>";
 			strAddress += "<div><span>住所：</span>";
-			strAddress += address.address2=="" ?  "" : address.address2+",&nbsp";
-			strAddress += address.address1=="" ?  "" : address.address1+",&nbsp";
-			strAddress += address.province+",&nbsp"+address.country +"</div>";
+			strAddress += address.street_2=="" ?  "" : address.street_2+",&nbsp";
+			strAddress += address.street_1=="" ?  "" : address.street_1+",&nbsp";
+			strAddress += address.state+",&nbsp"+address.country +"</div>";
 			strAddress +="<div>"+ address.zip +"</div>";
 			strAddress +="<div><span>電話番号：</span>"+ address.phone +"</div>";
 			document.getElementById("shipping_address").innerHTML =strAddress;
 
-			let other_info = "<div>メール：" + result.email + "</div>";
-			other_info += "<div>注文日時：" +result.processedAt + "</div>";
-			other_info += "<div>注文番号：" + result.name+ "</div>";
+			let other_info = "<div>メール：" + address.email + "</div>";
+			other_info += "<div>注文日時：" +result.date_created + "</div>";
+			other_info += "<div>注文番号：" + result.id+ "</div>";
 			document.getElementById("original_address").innerHTML = other_info;
 		}
 	});

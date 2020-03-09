@@ -283,8 +283,8 @@
   (prn "### get-customer-orders")
   (let [cookies (:cookies request)
         customer_token (-> cookies (get "customer_token") :value)
-        email (when (not-empty customer_token) (-> customer_token verify-jwt (get "email")))
-        url (str (-> request :params :url) "&email=" (url_util/uri-encode email))
+        id (when (not-empty customer_token) (-> customer_token verify-jwt (get "customer_id")))
+        url (str (-> request :params :url) "&customer_id=" id)
         ]
     (prn "###url=" url)
     (server-query url)
@@ -538,3 +538,33 @@
       )
     )
   )
+
+(defn get-order-by-id [request]
+    (try+
+      (let [customer_token (-> request :cookies (get "customer_token") :value)
+            customer_id (when (not-empty customer_token) (-> customer_token verify-jwt (get "customer_id")))
+            order_id (-> request :params :order_id)
+            order_info (-> (server-query (str "/v2/orders/" order_id)) :body json/read-str)
+           ]
+        (if (= customer_id (get order_info "customer_id"))
+          {:status 400 :body "{\"error\" \"There is NOT an order in order list of customer \"}"}
+          (let [product_url (-> order_info (get "products") (get "resource"))
+                info (-> (server-query (str "/v2" product_url)) :body json/read-str)
+                info (map #(assoc % "img" (-> (server-query (str "/v3/catalog/products/" (get %1 "product_id") "/images"))
+                                              :body json/read-str (get "data") first (get "url_thumbnail"))) info)
+                result (assoc order_info "products" info)
+                ]
+                (prn "### result" result)
+                {:status 200 :body (cjson/generate-string result)}
+            )
+          )
+        )
+      (catch :status e
+        (prn "### e=" e)
+        {:status 502 :body (:body e)}
+        )
+      (catch Exception e
+        (prn "### error=" e)
+        {:status 501 :body (cjson/generate-string e)}
+        ))
+    )

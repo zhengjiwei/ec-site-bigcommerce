@@ -219,6 +219,10 @@ function get_customer_orders(callback){
 	http_get_by_server("/bigcommerce/server/query", {"method": "get", "url":url}, callback);
 }
 
+function get_order_by_id(id, callback){
+	http_get_by_server("/bigcommerce/customer/orders/" + id, {}, callback);
+}
+
 function reset_customer_password(email, old_password, new_password, callback){
 	customer_login(email, old_password, function(result){
 		http_get_by_server("/bigcommerce/server/query", {"method": "put", "url": "/v2/customers/", "data":JSON.stringify({"_authentication": {"password": new_password, "password_confirmation": new_password}})}, callback);

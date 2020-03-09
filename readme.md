@@ -49,6 +49,9 @@
 - 注文完了ページ
 ![complete](readme/end.jpg)
 
+- 注文履歴
+![order list](readme/orderlist.jpg)
+
 - 会員ログイン
 ![login](readme/login.jpg)
 

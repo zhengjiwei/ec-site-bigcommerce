@@ -31,7 +31,10 @@
 		  (POST "/bigcommerce/front/query" request (storefront/process-front request))
 		  (POST "/bigcommerce/server/query" request (storefront/process-server request))
 		  (POST "/bigcommerce/server/payment" request (storefront/process-payment request))
-		  (POST "/bigcommerce/common/query" request (storefront/process-common request))
+      (POST "/bigcommerce/common/query" request (storefront/process-common request))
+      (POST "/bigcommerce/customer/orders/:order_id" request (storefront/get-order-by-id request))
+
+
 	      (route/not-found "Not Found")
            )
 
