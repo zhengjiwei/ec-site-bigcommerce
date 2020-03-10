@@ -33,29 +33,7 @@ if(token){
 				continue;
 			}
 			let currency = orders[j].currency_code;
-			productsList.push("<tr><td><a href=\"/order.html?oid="+ orders[j].id +"\"><div style=\"width:100%;height:100%\">" + orders[j].id + "</a></div></td><td>" + orders[j].date_created + "</td><td>" + orders[j].custom_status + "</td><td>" + orders[j].subtotal_inc_tax + "</td><td>" + orders[j].shipping_cost_inc_tax +"</td><tr>");
-		/*
-			let items = orders[j];
-			let currency = orders[j].currency_code;
-			productsList.push("<tr><td colspan=3 style='text-align:left'>注文日時："+orders[j].date_created + "</td></tr>");
-			for(let i=0; i<items.length; i++){
-				productsList.push("<tr>\n" +
-								  "        <td className=\"width20 valign-top\">\n" +
-								  "            <div style=\"text-align:left\"><img src=\"" + items[i].node.variant.image.src + "\" width=\"100px\" /></div>\n" +
-								  "        </td>\n" +
-								  "        <td className=\"width70 valign-top\">\n" +
-								  "            <div style=\"text-align:left\">商品名："+ items[i].node.title +"</div>\n" +
-								  "            <div style=\"text-align:left\">単価："+ Number(items[i].node.variant.priceV2.amount).toLocaleString('ja-JP', { style: 'currency', currency: currency})+"</div>\n" +
-								  "            <div style=\"text-align:left\">数量：<span>"+ items[i].node.quantity +"</span></div>\n" +
-								  "        </td>\n" +
-								  "        <td className=\"width10\">\n" +
-//								  "            <div>" + (i==(items.length-1) ? "税金："+Number(orders[j].node.totalTax).toLocaleString('ja-JP', { style: 'currency', currency:currency }) : "")  + "</div>\n" +
-//								  "            <div>" + (i==(items.length-1) ? "送料："+Number(orders[j].node.shippingLine.price).toLocaleString('ja-JP', { style: 'currency', currency:currency }) : "")  + "</div>\n" +
-								  "            <div>" + (i==(items.length-1) ? "合計："+Number(orders[j].node.totalPrice).toLocaleString('ja-JP', { style: 'currency', currency:currency }) : "")  + "</div>\n" +
-								  "    </tr>");
-			}
-			productsList.push("<tr><td colspan=3><hr></td></tr>");
-		*/
+			productsList.push("<tr><td><a href=\"/order.html?oid="+ orders[j].id +"\"><div style=\"width:100%;height:100%\">" + orders[j].id + "</a></div></td><td>" + orders[j].date_created + "</td><td>" + orders[j].custom_status + "</td><td>" + number_to_currency(orders[j].subtotal_inc_tax, currency) + "</td><td>" + number_to_currency(orders[j].shipping_cost_inc_tax, currency) +"</td><tr>");
 		}
 		document.getElementById("products_list").innerHTML = "<tr style=\"background-color:lightgray\"><td>注文番号</td><td>注文日時</td><td>状態</td><td>商品代金</td><td>送料</td>" + productsList.reverse().join("\n");
 /*

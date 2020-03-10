@@ -283,8 +283,8 @@
   (prn "### get-customer-orders")
   (let [cookies (:cookies request)
         customer_token (-> cookies (get "customer_token") :value)
-        id (when (not-empty customer_token) (-> customer_token verify-jwt (get "customer_id")))
-        url (str (-> request :params :url) "&customer_id=" id)
+        email (when (not-empty customer_token) (-> customer_token verify-jwt (get "email")))
+        url (str (-> request :params :url) "&email=" (url_util/uri-encode email))
         ]
     (prn "###url=" url)
     (server-query url)
