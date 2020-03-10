@@ -45,8 +45,10 @@ if ($("#page-header").length > 0) {
                         let src_img = category_info.node.defaultImage;
                         if(!src_img){
                             src_img = "/images/c" + (td_array.length+1) + ".png";
+                        }else{
+                          src_img = src_img.url;
                         }
-                        td_array.push("<td><a href=\"/collections/collection_one.html?cid=" + categories[index].entityId + "\"><img src=\"" + src_img + "\" width=\"285px\" height=\"100px\"></a></td>");
+                        td_array.push("<td><a href=\"/collections/collection_one.html?cid=" + categories[index].entityId + "\"><img src=\"" + src_img + "\" title=\""+ categories[index].name +"\" width=\"285px\" height=\"100px\"></a></td>");
                         if(td_array.length == 8){
                             let str_html = "<table><tr>" + td_array[0] + td_array[1] + td_array[2] + td_array[3] + "</tr><tr>" + td_array[4] + td_array[5] + td_array[6] + td_array[7] + "</tr></table>";
                             if (document.getElementById("normal_collections")) {

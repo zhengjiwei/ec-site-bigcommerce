@@ -262,7 +262,7 @@ function set_products_list(cid, limit, direction, cursor, tagId){
     get_products_list_in_category(cid, limit, direction, cursor, function(result) {
         if (result.node) {
             if(document.getElementById("topic_image")){
-                document.getElementById("topic_image").src = result.node.defaultImage == null ? "" : result.node.defaultImage;
+                document.getElementById("topic_image").src = result.node.defaultImage == null ? "" : result.node.defaultImage.url;
             }
             let data = result.node.products.edges;
             let output = [];
